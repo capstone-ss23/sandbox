@@ -36,7 +36,6 @@ function init() {
         this.style.accentColor = cssColor(hue, saturation, lightness)
     } 
 
-
 }
 
 // adapted from https://stackoverflow.com/a/62862049
@@ -101,4 +100,20 @@ function mouseMove(event) {
         mouseDownX = x;
         mouseDownY = y;
     }
+}
+
+// adapted from https://stackoverflow.com/a/44487883
+function saveCanvas() {
+    // get canvas
+    var canvas = document.getElementById("drawing");
+
+    // get download link
+    var link = document.getElementById("download_link");
+    link.setAttribute('download', 'canvas.png');
+    link.setAttribute(
+        'href',
+        canvas.toDataURL("image/png")
+            .replace("image/png", "image/octet-stream")
+    );
+    link.click();
 }
