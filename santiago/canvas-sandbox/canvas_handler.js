@@ -118,6 +118,7 @@ function drawCurve(ctx, x, y, line_width) {
     points.push([x, y]);
 
     if (points.length == 4) {
+        drawPoint(ctx, points[0][0], points[0][1], line_width);
         ctx.beginPath();
         ctx.moveTo(points[0][0], points[0][1]);
         ctx.bezierCurveTo(
