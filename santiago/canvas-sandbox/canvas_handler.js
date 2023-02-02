@@ -3,6 +3,7 @@ var pointerDownX = 0;
 var pointerDownY = 0;
 var line_width = 0;
 var pressureEnabled = false;
+var drawBezier = false;
 
 var hue = 0;
 var saturation = 100;
@@ -51,6 +52,10 @@ function togglePressure() {
     pressureEnabled = !pressureEnabled;
 }
 
+function toggleSmoothing() {
+    drawBezier = !drawBezier;
+}
+
 function pointerDown(event) {
     x = event.clientX;
     y = event.clientY;
@@ -60,10 +65,7 @@ function pointerDown(event) {
     var ctx = canvas.getContext("2d");
 
     // draw circle at pointer
-    ctx.beginPath();
-    ctx.arc(x, y, getLineWidth(event), 0, 2 * Math.PI, false);
-    ctx.fillStyle = cssColor(hue, saturation, lightness);
-    ctx.fill();
+    drawPoint(event, ctx);
 
     // set mouse down
     ispointerDown = true;
@@ -82,6 +84,56 @@ function getLineWidth(event) {
 
 function pointerUp(event) {
     ispointerDown = false;
+    points.length = 0;
+
+}
+
+function drawPoint(event, ctx, x, y) {
+    // draw circle at pointer
+    ctx.beginPath();
+    ctx.arc(x, y, getLineWidth(event), 0, 2 * Math.PI, false);
+    ctx.fillStyle = cssColor(hue, saturation, lightness);
+    ctx.fill();
+}
+
+function drawLine(event, ctx, x, y) {
+    // draw line to pointer
+    ctx.beginPath();
+    ctx.moveTo(pointerDownX, pointerDownY);
+    ctx.lineTo(x, y);
+    ctx.lineWidth = 2 * getLineWidth(event);
+    ctx.strokeStyle = cssColor(hue, saturation, lightness);
+    ctx.fillStyle = cssColor(hue, saturation, lightness);
+    ctx.stroke();
+
+    // draw circle at end of pointer
+    ctx.beginPath();
+    ctx.arc(x, y, getLineWidth(event), 0, 2 * Math.PI, false);
+    ctx.fillStyle = cssColor(hue, saturation, lightness);
+    ctx.fill();
+}
+
+let points = [];
+
+function drawCurve(event, ctx, x, y) {
+    // drawPoint(event, ctx, x, y);
+    points.push([x, y]);
+
+    if (points.length == 4) {
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        ctx.bezierCurveTo(
+            points[1][0], points[1][1],
+            points[2][0], points[2][1],
+            points[3][0], points[3][1],
+        );
+        ctx.lineWidth = 2 * getLineWidth(event);
+        ctx.strokeStyle = cssColor(hue, saturation, lightness);
+        ctx.stroke();
+
+        points.splice(0, points.length - 1);
+    }
+
 }
 
 function pointerMove(event) {
@@ -93,20 +145,11 @@ function pointerMove(event) {
         var canvas = document.getElementById("drawing");
         var ctx = canvas.getContext("2d");
 
-        // draw line to pointer
-        ctx.beginPath();
-        ctx.moveTo(pointerDownX, pointerDownY);
-        ctx.lineTo(x, y);
-        ctx.lineWidth = 2 * getLineWidth(event);
-        ctx.strokeStyle = cssColor(hue, saturation, lightness);
-        ctx.fillStyle = cssColor(hue, saturation, lightness);
-        ctx.stroke();
-
-        // draw circle at end of pointer
-        ctx.beginPath();
-        ctx.arc(x, y, getLineWidth(event), 0, 2 * Math.PI, false);
-        ctx.fillStyle = cssColor(hue, saturation, lightness);
-        ctx.fill();
+        if (drawBezier) {
+            drawCurve(event, ctx, x, y);
+        } else {
+            drawLine(event, ctx, x, y);
+        }
 
         // refresh pointerDown coords
         pointerDownX = x;
