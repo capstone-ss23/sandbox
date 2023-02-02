@@ -86,7 +86,6 @@ function getLineWidth(event) {
 function pointerUp(event) {
     ispointerDown = false;
     points.length = 0;
-
 }
 
 function drawPoint(ctx, x, y, radius) {
@@ -163,11 +162,14 @@ function saveCanvas() {
 
     // get download link
     var link = document.getElementById("download_link");
+    // set download name
     link.setAttribute('download', 'canvas.png');
+    // set download content
     link.setAttribute(
         'href',
         canvas.toDataURL("image/png")
             .replace("image/png", "image/octet-stream")
     );
+    // click download link
     link.click();
 }
