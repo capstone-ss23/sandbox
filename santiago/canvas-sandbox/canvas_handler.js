@@ -1,6 +1,6 @@
-var isMouseDown = false;
-var mouseDownX = 0;
-var mouseDownY = 0;
+var ispointerDown = false;
+var pointerDownX = 0;
+var pointerDownY = 0;
 var line_width = 0;
 
 var hue = 0;
@@ -14,9 +14,9 @@ function init() {
     canvas.setAttribute('height', window.innerHeight);
 
     //  attach event listeners
-    canvas.addEventListener("mousedown", mouseDown, false);
-    canvas.addEventListener("mouseup", mouseUp, false);
-    canvas.addEventListener("mousemove", mouseMove, false);
+    canvas.addEventListener("pointerdown", pointerDown, false);
+    canvas.addEventListener("pointerup", pointerUp, false);
+    canvas.addEventListener("pointermove", pointerMove, false);
 
     // get sliders
     var line_width_slider = document.getElementById("line_width");
@@ -46,7 +46,7 @@ function cssColor(h, s, l) {
         .replace(/L/, l);
 }
 
-function mouseDown(event) {
+function pointerDown(event) {
     x = event.clientX;
     y = event.clientY;
 
@@ -61,20 +61,20 @@ function mouseDown(event) {
     ctx.fill();
 
     // set mouse down
-    isMouseDown = true;
-    mouseDownX = x;
-    mouseDownY = y;
+    ispointerDown = true;
+    pointerDownX = x;
+    pointerDownY = y;
 }
 
-function mouseUp(event) {
-    isMouseDown = false;
+function pointerUp(event) {
+    ispointerDown = false;
 }
 
-function mouseMove(event) {
+function pointerMove(event) {
     x = event.clientX;
     y = event.clientY;
 
-    if (isMouseDown) {
+    if (ispointerDown) {
         // get context
         var canvas = document.getElementById("drawing");
         var ctx = canvas.getContext("2d");
@@ -83,7 +83,7 @@ function mouseMove(event) {
 
         // draw line to pointer
         ctx.beginPath();
-        ctx.moveTo(mouseDownX, mouseDownY);
+        ctx.moveTo(pointerDownX, pointerDownY);
         ctx.lineTo(x, y);
         ctx.lineWidth = 2 * line_width;
         ctx.strokeStyle = cssColor(hue, saturation, lightness);
@@ -96,9 +96,9 @@ function mouseMove(event) {
         ctx.fillStyle = cssColor(hue, saturation, lightness);
         ctx.fill();
 
-        // refresh mousedown coords
-        mouseDownX = x;
-        mouseDownY = y;
+        // refresh pointerDown coords
+        pointerDownX = x;
+        pointerDownY = y;
     }
 }
 
