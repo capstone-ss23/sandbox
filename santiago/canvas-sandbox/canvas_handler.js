@@ -93,8 +93,6 @@ function pointerMove(event) {
         var canvas = document.getElementById("drawing");
         var ctx = canvas.getContext("2d");
 
-        console.log(mouseDownX, mouseDownY);
-
         // draw line to pointer
         ctx.beginPath();
         ctx.moveTo(pointerDownX, pointerDownY);
