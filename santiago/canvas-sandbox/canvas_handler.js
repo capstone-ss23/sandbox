@@ -9,34 +9,35 @@ var hue = 0;
 var saturation = 100;
 var lightness = 50;
 
+/**
+ * Initialize a slider.
+ * @param {string} slider_id HTML ID of slider
+ * @param {Function} func Function to run on each slider update
+ */
+function initSlider(slider_id, func) {
+    // get slider by id
+    var slider = document.getElementById(slider_id);
+    // set input function and immediately call it
+    slider.oninput = func;
+    slider.oninput();
+}
+
 function init() {
     // find canvas
     var canvas = document.getElementById("drawing");
+
+    // set canvas size
     canvas.setAttribute('width', window.innerWidth);
     canvas.setAttribute('height', window.innerHeight);
 
-    //  attach event listeners
+    // attach event listeners
     canvas.addEventListener("pointerdown", pointerDown, false);
     canvas.addEventListener("pointerup", pointerUp, false);
     canvas.addEventListener("pointermove", pointerMove, false);
 
-    // get sliders
-    var line_width_slider = document.getElementById("line_width");
-    var hue_slider = document.getElementById("hue");
-
-    // set current values
-    line_width = line_width_slider.value;
-    hue = hue_slider.value;
-
-    // set hue slider to current color
-    hue_slider.style.accentColor = cssColor(hue, saturation, lightness)
-
-    // attatch slider handlers
-    line_width_slider.oninput = function() {line_width = this.value; } 
-    hue_slider.oninput = function() { 
-        hue = this.value;
-        this.style.accentColor = cssColor(hue, saturation, lightness)
-    } 
+    // initialize sliders
+    initSlider("line_width", function() { line_width = this.value; });
+    initSlider("hue", function() { hue = this.value; this.style.accentColor = cssColor(hue, saturation, lightness); });
 
 }
 
