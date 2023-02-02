@@ -66,7 +66,7 @@ function pointerDown(event) {
     var ctx = canvas.getContext("2d");
 
     // draw circle at pointer
-    drawPoint(event, ctx);
+    drawPoint(ctx, x, y, getLineWidth(event));
 
     // set mouse down
     ispointerDown = true;
@@ -89,34 +89,31 @@ function pointerUp(event) {
 
 }
 
-function drawPoint(event, ctx, x, y) {
-    // draw circle at pointer
+function drawPoint(ctx, x, y, radius) {
+    // draw point at coords
     ctx.beginPath();
-    ctx.arc(x, y, getLineWidth(event), 0, 2 * Math.PI, false);
+    ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
     ctx.fillStyle = cssColor(hue, saturation, lightness);
     ctx.fill();
 }
 
-function drawLine(event, ctx, x, y) {
+function drawLine(ctx, x, y, line_width) {
     // draw line to pointer
     ctx.beginPath();
     ctx.moveTo(pointerDownX, pointerDownY);
     ctx.lineTo(x, y);
-    ctx.lineWidth = 2 * getLineWidth(event);
+    ctx.lineWidth = 2 * line_width;
     ctx.strokeStyle = cssColor(hue, saturation, lightness);
     ctx.fillStyle = cssColor(hue, saturation, lightness);
     ctx.stroke();
 
     // draw circle at end of pointer
-    ctx.beginPath();
-    ctx.arc(x, y, getLineWidth(event), 0, 2 * Math.PI, false);
-    ctx.fillStyle = cssColor(hue, saturation, lightness);
-    ctx.fill();
+    drawPoint(ctx, x, y, line_width);
 }
 
 let points = [];
 
-function drawCurve(event, ctx, x, y) {
+function drawCurve(ctx, x, y, line_width) {
     // drawPoint(event, ctx, x, y);
     points.push([x, y]);
 
@@ -128,7 +125,7 @@ function drawCurve(event, ctx, x, y) {
             points[2][0], points[2][1],
             points[3][0], points[3][1],
         );
-        ctx.lineWidth = 2 * getLineWidth(event);
+        ctx.lineWidth = 2 * line_width;
         ctx.strokeStyle = cssColor(hue, saturation, lightness);
         ctx.stroke();
 
@@ -147,9 +144,9 @@ function pointerMove(event) {
         var ctx = canvas.getContext("2d");
 
         if (drawBezier) {
-            drawCurve(event, ctx, x, y);
+            drawCurve(ctx, x, y, getLineWidth(event));
         } else {
-            drawLine(event, ctx, x, y);
+            drawLine(ctx, x, y, getLineWidth(event));
         }
 
         // refresh pointerDown coords
