@@ -49,31 +49,6 @@ function cssColor(h, s, l) {
         .replace(/L/, l);
 }
 
-function togglePressure() {
-    pressureEnabled = !pressureEnabled;
-}
-
-function toggleSmoothing() {
-    drawBezier = !drawBezier;
-}
-
-function pointerDown(event) {
-    x = event.clientX;
-    y = event.clientY;
-
-    // get context
-    var canvas = document.getElementById("drawing");
-    var ctx = canvas.getContext("2d");
-
-    // draw circle at pointer
-    drawPoint(ctx, x, y, getLineWidth(event));
-
-    // set mouse down
-    ispointerDown = true;
-    pointerDownX = x;
-    pointerDownY = y;
-}
-
 function getLineWidth(event) {
     switch (event.pointerType) {
         case 'mouse':
@@ -81,11 +56,7 @@ function getLineWidth(event) {
         case 'pen':
         case 'touch':
             return pressureEnabled ? line_width * event.pressure : line_width;
-    }}
-
-function pointerUp(event) {
-    ispointerDown = false;
-    points.length = 0;
+    }
 }
 
 function drawPoint(ctx, x, y, radius) {
@@ -132,6 +103,36 @@ function drawCurve(ctx, x, y, line_width) {
         points.splice(0, points.length - 1);
     }
 
+}
+
+function togglePressure() {
+    pressureEnabled = !pressureEnabled;
+}
+
+function toggleSmoothing() {
+    drawBezier = !drawBezier;
+}
+
+function pointerDown(event) {
+    x = event.clientX;
+    y = event.clientY;
+
+    // get context
+    var canvas = document.getElementById("drawing");
+    var ctx = canvas.getContext("2d");
+
+    // draw circle at pointer
+    drawPoint(ctx, x, y, getLineWidth(event));
+
+    // set mouse down
+    ispointerDown = true;
+    pointerDownX = x;
+    pointerDownY = y;
+}
+
+function pointerUp(event) {
+    ispointerDown = false;
+    points.length = 0;
 }
 
 function pointerMove(event) {
