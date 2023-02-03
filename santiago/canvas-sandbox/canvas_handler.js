@@ -111,16 +111,16 @@ function drawSplines(ctx, points) {
         ctx.beginPath();
 
         ctx.moveTo(xc, yc);
-        var xc = (points[i].x + points[i + 1].x) / 2;
-        var yc = (points[i].y + points[i + 1].y) / 2;
+        xc = (points[i].x + points[i + 1].x) / 2;
+        yc = (points[i].y + points[i + 1].y) / 2;
         ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
 
-        ctx.lineWidth = points[i-1].w;
+        ctx.lineWidth = points[i - 1].w;
         ctx.strokeStyle = 'red';
         ctx.lineCap = 'round';
         ctx.stroke();
     }
-    ctx.quadraticCurveTo(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
+    ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
 
     ctx.lineWidth = points[i].w;
     ctx.strokeStyle = 'red';
