@@ -115,7 +115,7 @@ function drawSplines(ctx, points) {
         var yc = (points[i].y + points[i + 1].y) / 2;
         ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
 
-        ctx.lineWidth = points[i].w;
+        ctx.lineWidth = points[i-1].w;
         ctx.strokeStyle = 'red';
         ctx.lineCap = 'round';
         ctx.stroke();
