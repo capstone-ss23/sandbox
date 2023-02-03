@@ -1,9 +1,21 @@
 var ispointerDown = false;
-var pointerDownX = 0;
-var pointerDownY = 0;
 var line_width = 0;
-var pressureEnabled = false;
-var drawBezier = false;
+var pressureEnabled = true;
+var n = 0;
+var hasMoved = false;
+
+let points = [];
+let averaged_points = [];
+
+function Point(x, y, w) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+}
+
+function togglePressure() {
+    pressureEnabled = !pressureEnabled;
+}
 
 var hue = 0;
 var saturation = 100;
@@ -38,7 +50,7 @@ function init() {
     // initialize sliders
     initSlider("line_width", function() { line_width = this.value; });
     initSlider("hue", function() { hue = this.value; this.style.accentColor = cssColor(hue, saturation, lightness); });
-
+    initSlider("smoothing", function() { n = this.value; });
 }
 
 // adapted from https://stackoverflow.com/a/62862049
@@ -52,107 +64,114 @@ function cssColor(h, s, l) {
 function getLineWidth(event) {
     switch (event.pointerType) {
         case 'mouse':
-            return line_width;
+            return line_width | 0;
         case 'pen':
         case 'touch':
-            return pressureEnabled ? line_width * event.pressure : line_width;
+            return pressureEnabled ? line_width * event.pressure | 0 : line_width | 0;
     }
 }
 
-function drawPoint(ctx, x, y, radius) {
-    // draw point at coords
+function arithmeticMean(arr) {
+    var sum_x = 0;
+    var sum_y = 0;
+    var sum_w = 0;
+    for (const a of arr) {
+        sum_x += a.x | 0;
+        sum_y += a.y | 0;
+        sum_w += a.w | 0;
+    }
+    return new Point(sum_x / arr.length, sum_y / arr.length, sum_w / arr.length);
+}
+
+function drawPoint(ctx, point) {
     ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
+    ctx.arc(point.x, point.y, point.w, 0, 2 * Math.PI, false);
     ctx.fillStyle = cssColor(hue, saturation, lightness);
     ctx.fill();
 }
 
-function drawLine(ctx, x, y, line_width) {
-    // draw line to pointer
+function drawLine(ctx, from, to) {
+    var dir = new Point(to.x - from.x, to.y - from.y);
+    var angle = Math.atan2(dir.y, dir.x) - Math.PI / 2;
+
     ctx.beginPath();
-    ctx.moveTo(pointerDownX, pointerDownY);
-    ctx.lineTo(x, y);
-    ctx.lineWidth = 2 * line_width;
-    ctx.strokeStyle = cssColor(hue, saturation, lightness);
+    ctx.arc(to.x, to.y, to.w / 2, angle, angle + Math.PI);
+    ctx.arc(from.x, from.y, from.w / 2, angle + Math.PI, angle);
+    ctx.closePath()
+
     ctx.fillStyle = cssColor(hue, saturation, lightness);
-    ctx.stroke();
-
-    // draw circle at end of pointer
-    drawPoint(ctx, x, y, line_width);
+    ctx.fill();
 }
 
-let points = [];
-
-function drawCurve(ctx, x, y, line_width) {
-    // drawPoint(event, ctx, x, y);
-    points.push([x, y]);
-
-    if (points.length == 4) {
-        drawPoint(ctx, points[0][0], points[0][1], line_width);
+function drawSplines(ctx, points) {
+    for (i = 1; i < points.length - 2; i++) {
         ctx.beginPath();
-        ctx.moveTo(points[0][0], points[0][1]);
-        ctx.bezierCurveTo(
-            points[1][0], points[1][1],
-            points[2][0], points[2][1],
-            points[3][0], points[3][1],
-        );
-        ctx.lineWidth = 2 * line_width;
-        ctx.strokeStyle = cssColor(hue, saturation, lightness);
+
+        ctx.moveTo(points[i - 1].x, points[i - 1].y);
+        var xc = (points[i].x + points[i + 1].x) / 2;
+        var yc = (points[i].y + points[i + 1].y) / 2;
+        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+
+        ctx.lineWidth = points[i].w;
+        ctx.strokeStyle = 'red';
+        ctx.lineCap = 'round';
         ctx.stroke();
-
-        points.splice(0, points.length - 1);
     }
+    ctx.quadraticCurveTo(points[i].x, points[i].y, points[i+1].x, points[i+1].y);
 
-}
-
-function togglePressure() {
-    pressureEnabled = !pressureEnabled;
-}
-
-function toggleSmoothing() {
-    drawBezier = !drawBezier;
+    ctx.lineWidth = points[i].w;
+    ctx.strokeStyle = 'red';
+    ctx.lineCap = 'round';
+    ctx.stroke();
 }
 
 function pointerDown(event) {
     x = event.clientX;
     y = event.clientY;
 
-    // get context
-    var canvas = document.getElementById("drawing");
-    var ctx = canvas.getContext("2d");
-
-    // draw circle at pointer
-    drawPoint(ctx, x, y, getLineWidth(event));
+    averaged_points.length = 0;
 
     // set mouse down
     ispointerDown = true;
-    pointerDownX = x;
-    pointerDownY = y;
+    hasMoved = false;
 }
 
 function pointerUp(event) {
     ispointerDown = false;
     points.length = 0;
+    average = new Point(0, 0);
+    drawn_curve = false;
+
+    var canvas = document.getElementById("drawing");
+    var ctx = canvas.getContext("2d");
+
+    if (!hasMoved) drawPoint(ctx, new Point(x, y, getLineWidth(event) / 2));
+
+    drawSplines(ctx, averaged_points);
 }
 
 function pointerMove(event) {
     x = event.clientX;
     y = event.clientY;
+    hasMoved = true;
 
     if (ispointerDown) {
         // get context
         var canvas = document.getElementById("drawing");
         var ctx = canvas.getContext("2d");
 
-        if (drawBezier) {
-            drawCurve(ctx, x, y, getLineWidth(event));
-        } else {
-            drawLine(ctx, x, y, getLineWidth(event));
-        }
+        // add point to buffer
+        points.push(new Point(x, y, getLineWidth(event)));
 
-        // refresh pointerDown coords
-        pointerDownX = x;
-        pointerDownY = y;
+        if (points.length == n) {
+            points.shift();
+            var loc = arithmeticMean(points);
+            averaged_points.push(loc);
+
+            var from = averaged_points.at(-2);
+            var to = averaged_points.at(-1);
+            drawLine(ctx, from, to);
+        }
     }
 }
 
