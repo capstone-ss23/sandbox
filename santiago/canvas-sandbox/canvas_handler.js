@@ -104,10 +104,13 @@ function drawLine(ctx, from, to) {
 }
 
 function drawSplines(ctx, points) {
+    var xc = points[0].x;
+    var yc = points[0].y;
+
     for (i = 1; i < points.length - 2; i++) {
         ctx.beginPath();
 
-        ctx.moveTo(points[i - 1].x, points[i - 1].y);
+        ctx.moveTo(xc, yc);
         var xc = (points[i].x + points[i + 1].x) / 2;
         var yc = (points[i].y + points[i + 1].y) / 2;
         ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
