@@ -210,3 +210,34 @@ function saveCanvas() {
     // click download link
     link.click();
 }
+
+// adapted from https://stackoverflow.com/a/46403589
+function saveSVG() {
+    // get svg
+    var svg = document.getElementById("drawing-svg");
+
+    // generate content
+    var blob = new Blob(
+        [
+            '<?xml version="1.0" standalone="no"?>\n',
+            svg.outerHTML,
+        ],
+        { type: "image/svg+xml;charset=utf-8" }
+    );
+
+    // create download link
+    var link = document.createElement("a");
+    // set download name
+    link.setAttribute('download', 'canvas.svg');
+    // set download content
+    link.setAttribute(
+        'href',
+        URL.createObjectURL(blob)
+    );
+    // add download link to body
+    document.body.appendChild(link);
+    // click it
+    link.click();
+    // delete it
+    document.body.removeChild(link);
+}
