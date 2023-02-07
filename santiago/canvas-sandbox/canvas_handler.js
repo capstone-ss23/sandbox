@@ -37,15 +37,21 @@ function initSlider(slider_id, func) {
 function init() {
     // find canvas
     var canvas = document.getElementById("drawing");
+    // find svg
+    var svg = document.getElementById("drawing-svg");
 
     // set canvas size
     canvas.setAttribute('width', window.innerWidth);
     canvas.setAttribute('height', window.innerHeight);
 
+    // set svg size
+    svg.setAttribute('width', window.innerWidth);
+    svg.setAttribute('height', window.innerHeight);
+
     // attach event listeners
-    canvas.addEventListener("pointerdown", pointerDown, false);
-    canvas.addEventListener("pointerup", pointerUp, false);
-    canvas.addEventListener("pointermove", pointerMove, false);
+    svg.addEventListener("pointerdown", pointerDown, false);
+    svg.addEventListener("pointerup", pointerUp, false);
+    svg.addEventListener("pointermove", pointerMove, false);
 
     // initialize sliders
     initSlider("line_width", function() { line_width = this.value; });
