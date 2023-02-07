@@ -150,7 +150,7 @@ function pointerUp(event) {
 
     if (!hasMoved) drawPoint(ctx, new Point(x, y, getLineWidth(event) / 2));
 
-    drawSplines(ctx, averaged_points);
+    // drawSplines(ctx, averaged_points);
 }
 
 function pointerMove(event) {
