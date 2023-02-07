@@ -108,24 +108,32 @@ function drawSplines(ctx, points) {
     var yc = points[0].y;
 
     for (i = 1; i < points.length - 2; i++) {
-        ctx.beginPath();
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); // ctx.beginPath();
 
-        ctx.moveTo(xc, yc);
+        var string = `M ${xc},${yc} `; // ctx.moveTo(xc, yc);
+
         xc = (points[i].x + points[i + 1].x) / 2;
         yc = (points[i].y + points[i + 1].y) / 2;
-        ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
 
-        ctx.lineWidth = points[i - 1].w;
-        ctx.strokeStyle = 'red';
-        ctx.lineCap = 'round';
-        ctx.stroke();
+        string += `Q ${points[i].x},${points[i].y} ${xc},${yc}` // ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+
+        path.setAttributeNS(null, "d", string);
+        path.setAttributeNS(null, "stroke", cssColor(hue, saturation, lightness)); // ctx.strokeStyle = 'red';
+        path.setAttributeNS(null, "stroke-linecap", 'round'); // ctx.lineCap = 'round';
+        path.setAttributeNS(null, "stroke-width", points[i - 1].w); // ctx.lineWidth = points[i - 1].w;
+        path.setAttributeNS(null, "fill", "transparent");
+        document.getElementById("drawing-svg").appendChild(path); // ctx.stroke();
     }
-    ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); // ctx.beginPath();
+    string = `M ${xc},${yc} `; // ctx.moveTo(xc, yc);
+    string += `Q ${points[i].x},${points[i].y} ${points[i + 1].x},${points[i + 1].y}` // ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
+    path.setAttributeNS(null, "d", string);
 
-    ctx.lineWidth = points[i].w;
-    ctx.strokeStyle = 'red';
-    ctx.lineCap = 'round';
-    ctx.stroke();
+    path.setAttributeNS(null, "stroke-width", points[i].w); // ctx.lineWidth = points[i].w;
+    path.setAttributeNS(null, "stroke", cssColor(hue, saturation, lightness)); // ctx.strokeStyle = 'red';
+    path.setAttributeNS(null, "stroke-linecap", 'round'); // ctx.lineCap = 'round';
+    path.setAttributeNS(null, "fill", "transparent");
+    document.getElementById("drawing-svg").appendChild(path); // ctx.stroke();
 }
 
 function pointerDown(event) {
