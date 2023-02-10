@@ -121,11 +121,13 @@ function drawLine(ctx, from, to) {
     ctx.fill();
 }
 
-function drawSplines(ctx, points) {
+
 function pathIdFromPoint(x, y) {
     var topmost_path = document.elementsFromPoint(x, y).find(el => el.tagName == "path");
     return topmost_path.getAttribute("data-id");
 }
+
+function drawSplines(points) {
     var xc = points[0].x;
     var yc = points[0].y;
 
