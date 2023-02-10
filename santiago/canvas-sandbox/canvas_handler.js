@@ -163,6 +163,10 @@ function deletePath(path_id) {
         .forEach(e => e.remove());
 }
 
+function deleteSegment(x, y) {
+    document.elementsFromPoint(x, y).find(el => el.tagName == "path").remove();
+}
+
 function pointerDown(event) {
     x = event.clientX;
     y = event.clientY;
@@ -176,6 +180,9 @@ function pointerDown(event) {
     switch(tool) {
         case "eraser":
             deletePath(pathIdFromPoint(x, y));
+            break;
+        case "segment_eraser":
+            deleteSegment(x, y);
             break;
     }
 }
@@ -231,6 +238,9 @@ function pointerMove(event) {
                 break;
             case "eraser":
                 deletePath(pathIdFromPoint(x, y));
+                break;
+            case "segment_eraser":
+                deleteSegment(x, y);
                 break;
         }
 
