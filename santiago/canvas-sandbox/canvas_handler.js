@@ -3,6 +3,9 @@ var line_width = 0;
 var pressureEnabled = true;
 var n = 0;
 var hasMoved = false;
+var num_paths = 0;
+
+var tool = "pen";
 
 let points = [];
 let averaged_points = [];
@@ -15,6 +18,10 @@ function Point(x, y, w) {
 
 function togglePressure() {
     pressureEnabled = !pressureEnabled;
+}
+
+function changeTool(radio) {
+    tool = radio.value;
 }
 
 var hue = 0;
@@ -110,6 +117,10 @@ function drawLine(ctx, from, to) {
 }
 
 function drawSplines(ctx, points) {
+function pathIdFromPoint(x, y) {
+    var topmost_path = document.elementsFromPoint(x, y).find(el => el.tagName == "path");
+    return topmost_path.getAttribute("data-id");
+}
     var xc = points[0].x;
     var yc = points[0].y;
 
@@ -140,6 +151,13 @@ function drawSplines(ctx, points) {
     path.setAttributeNS(null, "stroke-linecap", 'round'); // ctx.lineCap = 'round';
     path.setAttributeNS(null, "fill", "transparent");
     document.getElementById("drawing-svg").appendChild(path); // ctx.stroke();
+    num_paths += 1;
+}
+
+function deletePath(path_id) {
+    // delete all elements with path id
+    document.querySelectorAll(`path[data-id="${path_id}"]`)
+        .forEach(e => e.remove());
 }
 
 function pointerDown(event) {
@@ -151,6 +169,12 @@ function pointerDown(event) {
     // set mouse down
     ispointerDown = true;
     hasMoved = false;
+
+    switch(tool) {
+        case "eraser":
+            deletePath(pathIdFromPoint(x, y));
+            break;
+    }
 }
 
 function pointerUp(event) {
@@ -162,12 +186,30 @@ function pointerUp(event) {
     var canvas = document.getElementById("drawing");
     var ctx = canvas.getContext("2d");
 
-    if (!hasMoved) drawPoint(ctx, new Point(x, y, getLineWidth(event) / 2));
+    switch(tool) {
+        case "pen":
+            if (!hasMoved) drawPoint(ctx, new Point(x, y, getLineWidth(event) / 2));
+            // draw path
+            drawSplines(averaged_points);
+            // clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            break;
+    }
+}
 
-    drawSplines(ctx, averaged_points);
-    // clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function penMove(ctx, x, y, line_width) {
+    // add point to buffer
+    points.push(new Point(x, y, line_width));
 
+    if (points.length == n) {
+        points.shift();
+        var loc = arithmeticMean(points);
+        averaged_points.push(loc);
+
+        var from = averaged_points.at(-2);
+        var to = averaged_points.at(-1);
+        drawLine(ctx, from, to);
+    }
 }
 
 function pointerMove(event) {
@@ -180,18 +222,15 @@ function pointerMove(event) {
         var canvas = document.getElementById("drawing");
         var ctx = canvas.getContext("2d");
 
-        // add point to buffer
-        points.push(new Point(x, y, getLineWidth(event)));
-
-        if (points.length == n) {
-            points.shift();
-            var loc = arithmeticMean(points);
-            averaged_points.push(loc);
-
-            var from = averaged_points.at(-2);
-            var to = averaged_points.at(-1);
-            drawLine(ctx, from, to);
+        switch(tool) {
+            case "pen":
+                penMove(ctx, x, y, getLineWidth(event));
+                break;
+            case "eraser":
+                deletePath(pathIdFromPoint(x, y));
+                break;
         }
+
     }
 }
 
