@@ -127,37 +127,33 @@ function pathIdFromPoint(x, y) {
     return topmost_path.getAttribute("data-id");
 }
 
+function makePath(path_string, width, path_id) {
+    var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttributeNS(null, "d", path_string);
+    path.setAttributeNS(null, "stroke", cssColor(hue, saturation, lightness));
+    path.setAttributeNS(null, "stroke-linecap", 'round');
+    path.setAttributeNS(null, "stroke-width", width);
+    path.setAttributeNS(null, "fill", "transparent");
+    path.setAttributeNS(null, "data-id", path_id);
+    document.getElementById("drawing-svg").appendChild(path);
+}
+
 function drawSplines(points) {
     var xc = points[0].x;
     var yc = points[0].y;
 
     for (i = 1; i < points.length - 2; i++) {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); // ctx.beginPath();
-
         var string = `M ${xc},${yc} `; // ctx.moveTo(xc, yc);
-
         xc = (points[i].x + points[i + 1].x) / 2;
         yc = (points[i].y + points[i + 1].y) / 2;
-
         string += `Q ${points[i].x},${points[i].y} ${xc},${yc}` // ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
 
-        path.setAttributeNS(null, "d", string);
-        path.setAttributeNS(null, "stroke", cssColor(hue, saturation, lightness)); // ctx.strokeStyle = 'red';
-        path.setAttributeNS(null, "stroke-linecap", 'round'); // ctx.lineCap = 'round';
-        path.setAttributeNS(null, "stroke-width", points[i - 1].w); // ctx.lineWidth = points[i - 1].w;
-        path.setAttributeNS(null, "fill", "transparent");
-        document.getElementById("drawing-svg").appendChild(path); // ctx.stroke();
+        makePath(string, points[i - 1].w, num_paths);
     }
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path"); // ctx.beginPath();
     string = `M ${xc},${yc} `; // ctx.moveTo(xc, yc);
     string += `Q ${points[i].x},${points[i].y} ${points[i + 1].x},${points[i + 1].y}` // ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
-    path.setAttributeNS(null, "d", string);
+    makePath(string, points[i].w, num_paths);
 
-    path.setAttributeNS(null, "stroke-width", points[i].w); // ctx.lineWidth = points[i].w;
-    path.setAttributeNS(null, "stroke", cssColor(hue, saturation, lightness)); // ctx.strokeStyle = 'red';
-    path.setAttributeNS(null, "stroke-linecap", 'round'); // ctx.lineCap = 'round';
-    path.setAttributeNS(null, "fill", "transparent");
-    document.getElementById("drawing-svg").appendChild(path); // ctx.stroke();
     num_paths += 1;
 }
 
