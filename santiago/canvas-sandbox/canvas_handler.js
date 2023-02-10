@@ -56,14 +56,19 @@ function init() {
     svg.setAttribute('height', window.innerHeight);
 
     // attach event listeners
-    svg.addEventListener("pointerdown", pointerDown, false);
-    svg.addEventListener("pointerup", pointerUp, false);
-    svg.addEventListener("pointermove", pointerMove, false);
+    addListeners(canvas);
+    addListeners(svg);
 
     // initialize sliders
     initSlider("line_width", function() { line_width = this.value; });
     initSlider("hue", function() { hue = this.value; this.style.accentColor = cssColor(hue, saturation, lightness); });
     initSlider("smoothing", function() { n = this.value; });
+}
+
+function addListeners(obj) {
+    obj.addEventListener("pointerdown", pointerDown, false);
+    obj.addEventListener("pointerup", pointerUp, false);
+    obj.addEventListener("pointermove", pointerMove, false);
 }
 
 // adapted from https://stackoverflow.com/a/62862049
