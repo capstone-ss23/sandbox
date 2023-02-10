@@ -121,6 +121,7 @@ function drawLine(ctx, from, to) {
     ctx.fill();
 }
 
+
 function pathIdFromPoint(x, y) {
     var topmost_path = document.elementsFromPoint(x, y).find(el => el.tagName == "path");
     return topmost_path.getAttribute("data-id");
