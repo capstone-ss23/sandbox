@@ -4,6 +4,10 @@ html, body {
     height: 100%;
     padding: 0;
     margin: 0;
+
+    touch-action: none;
+
+    overscroll-behavior-x: none;
 }
 
 .container {
@@ -15,6 +19,7 @@ html, body {
     width: 100%;
     height: 100%;
 
+    touch-action: none;
     z-index: 2;
 }
 
@@ -40,6 +45,7 @@ svg {
     z-index: -1;
 
     pointer-events: all;
+    touch-action: none;
 
     user-select: none;
     -moz-user-select: none;
